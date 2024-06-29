@@ -1,0 +1,56 @@
+const fs = require("fs");
+const path = require("path");
+const { fileURLToPath } = require("url");
+const { dirname } = require("path");
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
+
+function unLinkFile(localpath) {
+  return new Promise((resolve, reject) => {
+    let splittedFileName;
+    if (localpath.includes("\\")) {
+      splittedFileName = localpath.split("\\");
+      console.log("Windows file name : " + splittedFileName);
+    } else {
+      splittedFileName = localpath.split("/");
+      console.log("Linux file name : " + splittedFileName);
+    }
+    const fileNameToBeDeleted = splittedFileName[splittedFileName.length - 1];
+    console.log("file name : " + fileNameToBeDeleted);
+    if (process.env.NODE_ENV === "development") {
+      const filePath = path.join(
+        __dirname,
+        `../public/temp/${fileNameToBeDeleted}`
+      );
+      console.log("final file Path : " + filePath);
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.log("Error occurred while deleting file");
+          console.error(err);
+          reject(err);
+        } else {
+          console.log("File deleted successfully");
+          resolve(true);
+        }
+      });
+    } else {
+      const filePath = path.join(__dirname, `/tmp/${fileNameToBeDeleted}`);
+      console.log("final file Path : " + filePath);
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.log("Error occurred while deleting file");
+          console.error(err);
+          reject(err);
+        } else {
+          console.log("File deleted successfully");
+          resolve(true);
+        }
+      });
+    }
+  });
+}
+
+module.exports = { unLinkFile };
