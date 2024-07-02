@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import axios from "../apis/admin";
 import useSiteAuth from "../hooks/useSiteAuth";
 
-const RequireAuth = () => {
+const SiteAuth = () => {
   const { setSiteAuth } = useSiteAuth();
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -48,4 +48,4 @@ const RequireAuth = () => {
   );
 };
 
-export default RequireAuth;
+export default SiteAuth;

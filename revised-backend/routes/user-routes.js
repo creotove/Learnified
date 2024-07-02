@@ -6,6 +6,10 @@ const {
   getPackage,
   generateAccessAndRefereshTokens,
   logoutUser,
+  getInstructors,
+  getInstructor,
+  liveWebinars,
+  getLiveWebinar,
 } = require("../controllers/user-controllers.js");
 const { auth } = require("../middlewares/temp-auth-middleware.js");
 const { ApiResponse } = require("../utils/ApiResponse.js");
@@ -40,6 +44,12 @@ userRoute.post("/log-out", logoutUser);
 userRoute.post("/sign-up", signUpUser);
 
 userRoute.get("/packages", getPackages);
-userRoute.get("/package/:id", getPackage);
+userRoute.get("/packages/:id", getPackage);
+
+userRoute.get("/instructors", getInstructors);
+userRoute.get("/instructors/:id", getInstructor);
+
+userRoute.get("/live-webinars", liveWebinars);
+userRoute.get("/live-webinars/:id", getLiveWebinar);
 
 module.exports = { userRoute };

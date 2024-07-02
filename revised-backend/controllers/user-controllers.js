@@ -9,6 +9,8 @@ const CourseModel = require("../models/course-model.js");
 const {
   getUserBasedOnRefreshToken,
 } = require("../utils/getUserBasedOnRefreshToken.js");
+const InstructorModel = require("../models/instructor-model.js");
+const LiveWebinarModel = require("../models/live-webinar-model.js");
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -52,13 +54,13 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const signUpUser = asyncHandler(async (req, res) => {
-  const { firstName, lastName, email, password, phoneNumber, country, state } =
+  const { firstName, lastName, email, password, phoneNumber, city, state } =
     req.body;
   const { referral } = req.query;
   console.log("Referral Code: ", referral);
 
   if (
-    [firstName, lastName, email, password, phoneNumber, country, state].some(
+    [firstName, lastName, email, password, phoneNumber, city, state].some(
       (field) => field?.trim() === ""
     )
   )
@@ -79,7 +81,7 @@ const signUpUser = asyncHandler(async (req, res) => {
     email,
     password,
     phoneNumber,
-    country,
+    city,
     state,
   });
   if (!newUser) throw new ApiError(500, "Error while signing up");
@@ -204,7 +206,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
 const getPackages = asyncHandler(async (req, res) => {
   const packages = await PackageModel.find().select(
-    "name price description coverImage purchasedBy commission"
+    "name price tagLine coverImage purchasedBy commission"
   );
 
   if (packages.length === 0) {
@@ -217,10 +219,10 @@ const getPackages = asyncHandler(async (req, res) => {
       _id: pack._id,
       name: pack.name,
       price: pack.price,
-      description: pack.description,
       coverImage: pack.coverImage,
       purchasedBy: pack.purchasedBy.length,
       commission: pack.commission,
+      tagLine: pack.tagLine,
     };
   });
 
@@ -233,12 +235,15 @@ const getPackage = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) throw new ApiError(400, "Package id is required");
 
-  const pack = await PackageModel.findById(id);
+  const pack = await PackageModel.findOne({
+    _id: id,
+    isActive: true,
+  }).select(
+    "name price description tagLine priceWithPromoCode coverImage languages certification courses"
+  );
   if (!pack) throw new ApiError(404, "Package not found");
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, { pack }, "Package details"));
+  return res.status(200).json(new ApiResponse(200, pack, "Package details"));
 });
 
 const getEarningsOfUser = asyncHandler(async (req, res) => {
@@ -350,6 +355,133 @@ const getCourseProgress = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { course }, "Course progress details"));
 });
 
+const getInstructors = asyncHandler(async (req, res) => {
+  const instructors = await InstructorModel.find().select(
+    "firstName lastName avatar title"
+  );
+  if (instructors.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { instructors }, "No instructors found"));
+  }
+  return res.status(200).json(new ApiResponse(200, instructors, "Instructors"));
+});
+
+const getInstructor = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) throw new ApiError(400, "Instructor id is required");
+
+  const instructor = await InstructorModel.findById(id).select(
+    "-phoneNumber -email"
+  );
+
+  if (!instructor) throw new ApiError(404, "Instructor not found");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { instructor }, "Instructor details"));
+});
+
+const liveWebinars = asyncHandler(async (req, res) => {
+  const token = req.cookies?.accessToken;
+  const selectedFields = "title description date time isLive";
+  let liveWebinars;
+  if (token) {
+    liveWebinars = await LiveWebinarModel.find().select(
+      selectedFields + " link"
+    );
+  } else {
+    liveWebinars = await LiveWebinarModel.find().select(selectedFields);
+  }
+
+  if (liveWebinars.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, liveWebinars, "No live webinars found"));
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, liveWebinars, "Live webinars found"));
+});
+
+const getLiveWebinar = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) throw new ApiError(400, "Live webinar id is required");
+
+  const token = req.cookies?.accessToken;
+  const selectedFields = "title description date time isLive";
+  let liveWebinar;
+  if (token) {
+    liveWebinar = await LiveWebinarModel.findById(id).select(
+      selectedFields + " link"
+    );
+  } else {
+    liveWebinar = await LiveWebinarModel.findById(id).select(selectedFields);
+  }
+
+  if (!liveWebinar) throw new ApiError(404, "Live webinar not found");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { liveWebinar }, "Live webinar details"));
+});
+
+const getLeaderBoard = asyncHandler(async (req, res) => {
+  const { page, limit } = req.query;
+  const leaderBoard = await UserModel.aggregate([
+    {
+      $match: {
+        isAffiliated: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "affiliatedusers",
+        localField: "_id",
+        foreignField: "user_id",
+        as: "affiliatedUser",
+      },
+    },
+    {
+      $unwind: "$affiliatedUser",
+    },
+    {
+      $project: {
+        _id: 1,
+        earnings: "$affiliatedUser.earnings",
+      },
+    },
+    {
+      $sort: {
+        earnings: -1,
+      },
+    },
+    {
+      $skip: (page - 1) * limit,
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $project: {
+        _id: 1,
+        earnings: 1,
+        firstName: 1,
+        lastName: 1,
+      },
+    },
+  ]);
+
+  if (leaderBoard.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, leaderBoard, "No leaderboard found"));
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, leaderBoard[0], "Leaderboard found"));
+});
+
 module.exports = {
   refreshAccessToken,
   logoutUser,
@@ -363,4 +495,9 @@ module.exports = {
   getCourse,
   getCourseProgress,
   generateAccessAndRefereshTokens,
+  getInstructors,
+  getInstructor,
+  liveWebinars,
+  getLiveWebinar,
+  getLeaderBoard,
 };

@@ -21,11 +21,11 @@ import Home from "./Site/pages/Home";
 import BecomeAnAffiliate from "./Site/pages/BecomeAnAffiliate";
 
 import AdminLayout from "./Admin/Index";
-import CreateCourse from "./Admin/CreateCourse";
+import CreateCourse from "./Admin/AddCourse.js";
 import Courses from "./Admin/Courses";
 import AdminHome from "./Admin/Home";
 import AdminPackages from "./Admin/Packages";
-import CreatePackage from "./Admin/CreatePackage";
+import CreatePackage from "./Admin/AddPackage.js";
 import AddVideosToCourse from "./Admin/AddVideosToCourse";
 import AddCourseToPackage from "./Admin/AddCourseToPackage";
 
@@ -37,14 +37,16 @@ import WithdrawEarnings from "./Affiliate-panel/pages/WithdrawEarnings";
 import AffiliatedUserHome from "./Affiliate-panel/pages/Home";
 import AffiliateLayout from "./Affiliate-panel/AffiliateLayout";
 
-import CommingSoon from "./utils-components/ComingSoon";
+import CommingSoon from "./utils/ComingSoon.js";
 import CoursePlayLayout from "./Course/CoursePlayLayout";
 import Contact from "./Site/pages/Contact.js";
 import About from "./Site/pages/About";
-import Packages from "./Site/pages/Packages";
 import PackageShow from "./Site/pages/PackageShow.js";
 import AddInstructor from "./Admin/AddInstructor.js";
 import Instructor from "./Admin/Instructor.js";
+import SiteAuth from "./Middleware/SiteAuth.js";
+import AddTrainingVideo from "./Admin/AddTrainingVideo.js";
+import TrainingVideo from "./Admin/TrainingVideo.js";
 
 const App = () => {
   return (
@@ -59,7 +61,7 @@ const App = () => {
         <Route path="/" element={<SiteLayout />}>
           <Route path="" element={<Home />} />
           <Route path="courses" element={<div>Site Courses</div>} />
-          <Route path="packages" element={<Packages />} />
+          {/* <Route path="packages" element={<Packages />} /> */}
           <Route path="packages/:id" element={<PackageShow />} />
           <Route path="about" element={<About />} />
           <Route path="contact-us" element={<Contact />} />
@@ -114,6 +116,8 @@ const App = () => {
               element={<AddVideosToCourse />}
             />
             <Route path="add-to-package" element={<AddCourseToPackage />} />
+            <Route path="training-video" element={<TrainingVideo />} />
+            <Route path="add-training-video" element={<AddTrainingVideo />} />
             <Route path="add-instructor" element={<AddInstructor />} />
             <Route path="instructor" element={<Instructor />} />
             <Route path="courses" element={<Courses />} />

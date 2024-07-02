@@ -6,6 +6,7 @@ import linkedinIcon from "../../assets/icons/pack/linkIcon.svg";
 import twitterIcon from "../../assets/icons/pack/xIcon.svg";
 import youtubeIcon from "../../assets/icons/pack/youtubeIcon-v2.svg";
 import { Link } from "react-router-dom";
+import scrollToTop from "../../utils/scrollToTop";
 
 const Footer = () => {
   return (
@@ -62,7 +63,7 @@ const Footer = () => {
           <div>
             <p className="font-bold mb-3">Useful Links</p>
             <div className="flex flex-col gap-1">
-              <Link to={"/"} className="w-max">
+              <Link to={"/about"} className="w-max" onClick={scrollToTop}>
                 About us
               </Link>
               <Link to={"/"} className="w-max">

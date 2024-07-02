@@ -12,6 +12,7 @@ const {
   getUserEarnings,
   getMyCourses,
   getCourse,
+  getTrainingVideos,
 } = require("../controllers/affiliate-controller.js");
 
 const affiliateRoute = Router();
@@ -27,4 +28,6 @@ affiliateRoute.get("/packages", getPackages);
 affiliateRoute.get("/me", getProfile);
 affiliateRoute.get("/my-courses/:id", getMyCourses);
 affiliateRoute.get("/course/:id", getCourse);
+affiliateRoute.get("/training-videos", getTrainingVideos);
+
 module.exports = affiliateRoute;

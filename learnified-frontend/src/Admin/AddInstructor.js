@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "../apis/admin";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const AddInstructor = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [title, setTitle] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [experience, setExperience] = useState("");
@@ -11,6 +13,32 @@ const AddInstructor = () => {
   const [avatar, setAvatar] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const { state } = useLocation();
+
+  const checkIsEditMode = () => {
+    if (state && state.edit) {
+      console.log(state);
+      setEditMode(state.edit);
+      fetchInstructor();
+    }
+  };
+
+  const fetchInstructor = async () => {
+    try {
+      const res = await axios.get(`/instructors/${state.instructorId}`);
+      const instructor = res.data.data;
+      setFirstName(instructor.firstName);
+      setLastName(instructor.lastName);
+      setTitle(instructor.title);
+      setEmail(instructor.email);
+      setPhoneNumber(instructor.phoneNumber);
+      setExperience(instructor.experience);
+      setBio(instructor.bio);
+    } catch (error) {
+      console.error("Error fetching instructor:", error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,15 +53,23 @@ const AddInstructor = () => {
       data.append("phoneNumber", phoneNumber);
       data.append("experience", experience);
       data.append("bio", bio);
-
-      const res = await axios.post("/instructors", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      data.append("title", title);
+      let res;
+      if (editMode) {
+        res = await axios.patch("/instructors", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      } else {
+        res = await axios.post("/instructors", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
       if (res.data.success) {
         console.log("Instructor added successfully");
-        // navigate to another page if needed
       }
     } catch (error) {
       console.error("Error adding instructor:", error);
@@ -42,7 +78,9 @@ const AddInstructor = () => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    checkIsEditMode();
+  }, []);
   return (
     <section className="p-5">
       {error && (
@@ -80,6 +118,19 @@ const AddInstructor = () => {
             id="lastName"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="lastName" className="block mb-1">
+            Title
+          </label>
+          <input
+            type="text"
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="border border-gray-300 rounded-md px-3 py-2 w-full"
             required
           />

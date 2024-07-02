@@ -5,13 +5,34 @@ const PackageModel = require("../models/package-model.js");
 const CourseModel = require("../models/course-model.js");
 const PromoCodeModel = require("../models/promo-code-model.js");
 const uploadOnCloudinary = require("../utils/cloudinary.js");
+const uploadOnVimeo = require("../utils/vimeo.js");
 const { unLinkFile } = require("../utils/unLinkFile.js");
 const VideoModel = require("../models/video-model.js");
 const InstructorModel = require("../models/instructor-model.js");
+const LiveWebinarModel = require("../models/live-webinar-model.js");
+const TrainingVideoModel = require("../models/training-video-model.js");
 
 const createPackage = asyncHandler(async (req, res) => {
-  const { name, price, description, commission } = req.body;
-  if ([name, price, description, commission].some((field) => !field)) {
+  const {
+    name,
+    price,
+    description,
+    commission,
+    certification,
+    tagLine,
+    priceWithPromoCode,
+  } = req.body;
+  if (
+    [
+      name,
+      price,
+      description,
+      commission,
+      certification,
+      tagLine,
+      priceWithPromoCode,
+    ].some((field) => !field)
+  ) {
     throw new ApiError(400, "Please provide all the required fields");
   }
   const existedPacakge = await PackageModel.findOne({ name });
@@ -39,6 +60,10 @@ const createPackage = asyncHandler(async (req, res) => {
     price,
     description,
     commission,
+    certification,
+    tagLine,
+    priceWithPromoCode,
+    coverImage: coverImageUpload.url,
   });
   if (!newPackage) {
     throw new ApiError(500, "Failed to create package");
@@ -97,11 +122,23 @@ const updatePackage = asyncHandler(async (req, res) => {
     if (coverImageUpload) pack.coverImage = coverImageUpload.url;
   }
 
-  const { name, price, description, commission } = req.body;
+  const {
+    name,
+    price,
+    description,
+    commission,
+    certification,
+    tagLine,
+    priceWithPromoCode,
+  } = req.body;
   if (name) pack.name = name;
   if (price) pack.price = price;
   if (description) pack.description = description;
   if (commission) pack.commission = commission;
+  if (certification)
+    pack.certification = certification == "true" ? true : false;
+  if (tagLine) pack.tagLine = tagLine;
+  if (priceWithPromoCode) pack.priceWithPromoCode = priceWithPromoCode;
 
   await pack.save();
   return res.status(200).json(new ApiResponse(200, pack, "Package updated"));
@@ -168,9 +205,10 @@ const createCourse = asyncHandler(async (req, res) => {
 });
 
 const createInstructor = asyncHandler(async (req, res) => {
-  const { firstName, lastName, email, phoneNumber, experience, bio } = req.body;
+  const { firstName, lastName, email, phoneNumber, experience, bio, title } =
+    req.body;
   if (
-    [firstName, lastName, email, phoneNumber, experience, bio].some(
+    [firstName, lastName, email, phoneNumber, experience, bio, title].some(
       (field) => !field
     )
   ) {
@@ -210,6 +248,7 @@ const createInstructor = asyncHandler(async (req, res) => {
     experience,
     bio,
     avatar: avatarUpload.url,
+    title,
   });
   if (!newInstructor) {
     throw new ApiError(500, "Failed to create instructor");
@@ -217,6 +256,35 @@ const createInstructor = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(201, {}, "Instructor created successfully", true));
+});
+
+const getInstructors = asyncHandler(async (req, res) => {
+  const instructors = await InstructorModel.find({}).select(
+    "firstName lastName avatar title"
+  );
+  if (instructors.length === 0) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, {}, "Instructors not found"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, instructors, "Instructors found"));
+});
+
+const getInstructor = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    throw new ApiError(400, "Instructor ID is required");
+  }
+  const instructor = await InstructorModel.findById(id);
+  if (!instructor) {
+    throw new ApiError(404, "Instructor not found");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, instructor, "Instructor found"));
 });
 
 const updateInstructor = asyncHandler(async (req, res) => {
@@ -253,7 +321,8 @@ const updateInstructor = asyncHandler(async (req, res) => {
       });
   }
 
-  const { firstName, lastName, email, phoneNumber, experience, bio } = req.body;
+  const { firstName, lastName, email, phoneNumber, experience, bio, title } =
+    req.body;
   if (firstName) instructor.firstName = firstName;
   if (lastName) instructor.lastName = lastName;
   if (email) instructor.email = email;
@@ -261,6 +330,7 @@ const updateInstructor = asyncHandler(async (req, res) => {
   if (experience) instructor.experience = experience;
   if (bio) instructor.bio = bio;
   if (avatarUpload) instructor.avatar = avatarUpload.url;
+  if (title) instructor.title = title;
 
   await instructor.save();
   return res
@@ -442,7 +512,7 @@ const addVideosToCourseV2 = asyncHandler(async (req, res) => {
 
     const newVideo = await VideoModel.create({
       name: title,
-      videoUrl: videoUpload.url,
+      videoId: videoUpload.url,
       thumbnail: thumbnailUpload.url,
     });
 
@@ -471,9 +541,195 @@ const addVideosToCourseV2 = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, {}, "Videos added successfully", true));
 });
 
+const addVideosToCourseV1 = asyncHandler(async (req, res) => {
+  const vidsLength = req.body?.videos?.length;
+  const videos = [];
+  const files = req.files;
+
+  for (let i = 0; i < vidsLength; i++) {
+    const videoFile = files.find(
+      (file) => file.fieldname === `videos[${i}][videoFile]`
+    );
+    const thumbnailFile = files.find(
+      (file) => file.fieldname === `videos[${i}][thumbnailFile]`
+    );
+    const title = req.body?.videos[i]?.title;
+
+    const videoUploadUrl = await uploadOnVimeo(videoFile.path, title);
+
+    const thumbnailUpload = await uploadThumbnail(thumbnailFile.path);
+
+    const newVideo = await VideoModel.create({
+      name: title,
+      videoId: videoUploadUrl,
+      thumbnail: thumbnailUpload.url,
+    });
+
+    if (!newVideo) {
+      throw new ApiError(500, "Failed to create video");
+    }
+
+    await Promise.all([
+      unLinkFile(videoFile.path).catch((error) =>
+        console.error("Deletion error:", error)
+      ),
+      unLinkFile(thumbnailFile.path).catch((error) =>
+        console.error("Deletion error:", error)
+      ),
+    ]);
+
+    videos.push(newVideo._id);
+  }
+
+  console.log(videos);
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, "Videos added successfully", { videos }));
+});
 const removeVideosFromCourse = asyncHandler(async (req, res) => {});
 
 const createAdmin = asyncHandler(async (req, res) => {});
+
+const createLiveWebinar = asyncHandler(async (req, res) => {
+  const { title, description, date, time, link, instructorId } = req.body;
+  if (
+    [title, description, date, time, link, instructorId].some((field) => !field)
+  ) {
+    throw new ApiError(400, "Please provide all the required fields");
+  }
+  let coverImageUpload;
+  if (req.file && req.file.fieldname === "coverImage") {
+    const coverImage = req.file.path;
+    coverImageUpload = await uploadOnCloudinary(coverImage);
+    if (!coverImageUpload) throw new ApiError(400, "Cover Image Upload failed");
+    await unLinkFile(coverImage.path)
+      .then((result) => {
+        console.log("Deletion result:", result);
+      })
+      .catch((error) => {
+        console.error("Deletion error:", error);
+      });
+  } else {
+    throw new ApiError(400, "Cover Image is required");
+  }
+  const newLiveWebinar = await LiveWebinarModel.create({
+    title,
+    description,
+    date,
+    time,
+    link,
+    instructor: instructorId,
+    coverImage: coverImageUpload.url,
+  });
+  if (!newLiveWebinar) {
+    throw new ApiError(500, "Failed to create live webinar");
+  }
+  return res
+    .status(201)
+    .json(new ApiResponse(201, {}, "Live webinar created successfully"));
+});
+
+const updateLiveWebinar = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    throw new ApiError(400, "Live Webinar ID is required");
+  }
+  const liveWebinar = await LiveWebinarModel.findById(id);
+  if (!liveWebinar) {
+    throw new ApiError(404, "Live Webinar not found");
+  }
+  const { title, description, date, time, link, isLive, instructorId } =
+    req.body;
+  let coverImageUpload;
+  if (req.file && req.file.fieldname === "coverImage") {
+    const coverImage = req.file.path;
+    coverImageUpload = await uploadOnCloudinary(coverImage);
+    if (!coverImageUpload) throw new ApiError(400, "Cover Image Upload failed");
+    await unLinkFile(coverImage.path)
+      .then((result) => {
+        console.log("Deletion result:", result);
+      })
+      .catch((error) => {
+        console.error("Deletion error:", error);
+      });
+  }
+  if (title) liveWebinar.title = title;
+  if (description) liveWebinar.description = description;
+  if (date) liveWebinar.date = date;
+  if (time) liveWebinar.time = time;
+  if (link) liveWebinar.link = link;
+  if (isLive) liveWebinar.isLive = isLive;
+  if (instructorId) liveWebinar.instructor = instructorId;
+  if (coverImageUpload) liveWebinar.coverImage = coverImageUpload.url;
+
+  await liveWebinar.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, liveWebinar, "Live Webinar updated"));
+});
+
+const deleteLiveWebinar = asyncHandler(async (req, res) => {});
+
+const addTrainingVideo = asyncHandler(async (req, res) => {
+  const { videoId } = req.body;
+  if (!videoId) {
+    throw new ApiError(400, "Please provide all the required fields");
+  }
+  const newTrainingVideo = await TrainingVideoModel.create({
+    videoId,
+  });
+  if (!newTrainingVideo) {
+    throw new ApiError(500, "Failed to create training video");
+  }
+  return res
+    .status(201)
+    .json(new ApiResponse(201, {}, "Training video created successfully"));
+});
+
+const updateTrainingVideo = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    throw new ApiError(400, "Training Video ID is required");
+  }
+  const trainingVideo = await TrainingVideoModel.findById(id);
+  if (!trainingVideo) {
+    throw new ApiError(404, "Training Video not found");
+  }
+  const { videoId } = req.body;
+  if (videoId) trainingVideo.videoId = videoId;
+  await trainingVideo.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, trainingVideo, "Training Video updated"));
+});
+
+const deleteTrainingVideo = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    throw new ApiError(400, "Training Video ID is required");
+  }
+  const trainingVideo = await TrainingVideoModel.findById(id);
+  if (!trainingVideo) {
+    throw new ApiError(404, "Training Video not found");
+  }
+  await trainingVideo.remove();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Training Video deleted successfully"));
+});
+
+const getTrainingVideos = asyncHandler(async (req, res) => {
+  const trainingVideos = await TrainingVideoModel.find({});
+  if (trainingVideos.length === 0) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, {}, "Training Videos not found"));
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, trainingVideos, "Training Videos found"));
+});
 
 module.exports = {
   createPackage,
@@ -486,13 +742,16 @@ module.exports = {
   updatePromoCode,
   deletePromoCode,
   addVideosToCourseV2,
+  addVideosToCourseV1,
   removeVideosFromCourse,
   createAdmin,
   getPackages,
   createInstructor,
   updateInstructor,
+  getInstructors,
+  getInstructor,
+  addTrainingVideo,
+  updateTrainingVideo,
+  deleteTrainingVideo,
+  getTrainingVideos,
 };
-// yt-dlp.exe https://bam.nr-data.net/events/1/689d5b4562?a=621065044&sa=1&v=1216.487a282&t=Unnamed%20Transaction&rst=11467&ck=1&ref=https://player.vimeo.com/video/824678004
-// yt-dlp.exe https://vod-adaptive-ak.vimeocdn.com/exp=1719487940~acl=%2F077849ff-3570-48be-90a0-57be5ba90213%2F%2A~hmac=9d88e848920cc1aa7dadeafcd97185b72208926a392e5cbd917c36e19dbb96aa/077849ff-3570-48be-90a0-57be5ba90213/v2/range/avf/a5d82afe-fd58-4e7e-99e3-377816e61b7b.mp4?pathsig=8c953e4f~_bBOSrPev-n0Q49EttsNVAQ0PWphyU-9zUQV-jUy8aM&r=dXMtd2VzdDE%3D&range=2174-133951
-// ffmpeg -i 1.mp4  -codec:v libx264 -codec:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename "${outputPath}/segment%03d.ts" -start_number 0 outputs/index.m3u8
-// ffmpeg -i 1.mp4  -codec:v libx264 -codec:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename "${outputPath}/segment%03d.ts" -start_number 0 outputs/index.m3u8

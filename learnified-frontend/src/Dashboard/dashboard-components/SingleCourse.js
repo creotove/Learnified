@@ -1,4 +1,4 @@
-import { Button } from "../../utils-components";
+import { Button } from "../../utils";
 import cheveronUpIcon from "../../assets/icons/pack/cheveronUpIcon.svg";
 import axios from "../../apis/affiliate-user";
 import { useNavigate } from "react-router-dom";

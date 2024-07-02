@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs } from "../../utils-components";
+import { Tabs } from "../../utils";
 import behindTheStory from "../../assets/images/behind-the-story.png";
 import students from "../../assets/icons/pack/usersIcon-v1.svg";
 import instructors from "../../assets/icons/pack/teachingIcon-v1.svg";

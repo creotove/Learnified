@@ -10,6 +10,10 @@ const liveWebinarSchema = new mongoose.Schema(
       type: String,
       required: [true, "Description is required"],
     },
+    coverImage: {
+      type: String,
+      required: [true, "Cover Image is required"],
+    },
     date: {
       type: Date,
       required: [true, "Date is required"],
@@ -26,9 +30,14 @@ const liveWebinarSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    instructor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Instructor",
+      required: [true, "Instructor is required"],
+    },
   },
   { timestamps: true }
 );
 
-const LiveWebinar = mongoose.model("LiveWebinar", liveWebinarSchema);
-module.exports = LiveWebinar;
+const LiveWebinarModel = mongoose.model("LiveWebinar", liveWebinarSchema);
+module.exports = LiveWebinarModel;

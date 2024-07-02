@@ -17,6 +17,7 @@ const {
 } = require("../utils/getUserBasedOnRefreshToken.js");
 const { default: mongoose } = require("mongoose");
 const CourseModel = require("../models/course-model.js");
+const TrainingVideoModel = require("../models/training-video-model.js");
 
 const withdrawEarnings = asyncHandler(async (req, res) => {
   const { amount, id, type } = req.body;
@@ -558,19 +559,31 @@ const getCourse = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, course, "Course found"));
 });
-getMyCourses,
-  (module.exports = {
-    becomeAnAffiliate,
-    withdrawEarnings,
-    getMyReferedUsers,
-    getMyEarnings,
-    getUserEarnings,
-    addWalletDetails,
-    getWalletDetails,
-    checkWalletDetailsAvailability,
-    getPayoutRequests,
-    getPackages,
-    getProfile,
-    getMyCourses,
-    getCourse,
-  });
+
+const getTrainingVideos = asyncHandler(async (req, res) => {
+  const videos = await TrainingVideoModel.find();
+  if (videos.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { videos }, "No videos found"));
+  }
+  return res.status(200).json(new ApiResponse(200, videos, "Videos"));
+});
+
+module.exports = {
+  getMyCourses,
+  becomeAnAffiliate,
+  withdrawEarnings,
+  getMyReferedUsers,
+  getMyEarnings,
+  getUserEarnings,
+  addWalletDetails,
+  getWalletDetails,
+  checkWalletDetailsAvailability,
+  getPayoutRequests,
+  getPackages,
+  getProfile,
+  getMyCourses,
+  getCourse,
+  getTrainingVideos,
+};

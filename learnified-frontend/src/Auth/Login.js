@@ -239,6 +239,9 @@ const Login = () => {
       });
       if (res.data.success) {
         const data = res.data.data;
+        console.log(data);
+        localStorage.setItem("refreshToken", data.refreshToken);
+        localStorage.setItem("accessToken", data.accessToken);
         setAuth({ user: data?.user });
         setSiteAuth({ user: data?.user });
         if (res.data?.isAdmin) {

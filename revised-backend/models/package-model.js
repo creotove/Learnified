@@ -14,7 +14,19 @@ const packageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    tagLine: {
+      type: String,
+      required: true,
+    },
+    certification: {
+      type: Boolean,
+      required: true,
+    },
     commission: {
+      type: Number,
+      required: true,
+    },
+    priceWithPromoCode: {
       type: Number,
       required: true,
     },
@@ -43,6 +55,7 @@ const packageSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "PromoCode",
+        required: false,
       },
     ],
   },

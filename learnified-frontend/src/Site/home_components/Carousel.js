@@ -125,7 +125,7 @@ const Carousel = () => {
     const { onClick } = props;
     return (
       <img
-        className="bg-red-600 cursor-pointer rounded-lg h-16 absolute rotate-180 top-1/2 left-2/3 z-50"
+        className="bg-red-600 cursor-pointer rounded-lg h-16 absolute rotate-180 top-1/2 left-2/3 z-10"
         src={arrowIcon}
         onClick={onClick}
       />
@@ -136,7 +136,7 @@ const Carousel = () => {
     const { onClick } = props;
     return (
       <img
-        className="bg-red-600 cursor-pointer rounded-lg h-16 absolute top-1/2 right-2/3 z-50"
+        className="bg-red-600 cursor-pointer rounded-lg h-16 absolute top-1/2 right-2/3 z-10"
         src={arrowIcon}
         onClick={onClick}
       />

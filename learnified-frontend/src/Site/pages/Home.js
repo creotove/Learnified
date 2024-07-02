@@ -28,9 +28,6 @@ const Home = () => {
       <MyMarquee direction={"right"} />
       {/* One section of images remaining */}
       <RecentBlogs />
-      <section className="relative">
-        <Subscribe />
-      </section>
     </main>
   );
 };

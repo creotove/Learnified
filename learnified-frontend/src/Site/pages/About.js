@@ -1,7 +1,7 @@
 import React from "react";
 import aboutUsMan from "../../assets/images/aboutUsMan.png";
 import aboutUsVisionMan from "../../assets/images/aboutUsVisionMan.png";
-import { Tabs } from "../../utils-components";
+import { Tabs } from "../../utils";
 import searchIcon from "../../assets/icons/pack/searchIcon.svg";
 import targetIcon from "../../assets/icons/pack/targetIcon.svg";
 import lightBulbIcon from "../../assets/icons/pack/lightBulbIcon.svg";
@@ -61,7 +61,7 @@ const About = () => {
   return (
     <section className="lg:mx-28 mx-5 py-10">
       {/* Heading */}
-      <h1 className="lg:text-7xl text-3xl font-bold text-center">ABOUT US</h1>
+      <h1 className="lg:text-7xl text-3xl font-bold text-center ">ABOUT US</h1>
       {/* About Us */}
       <div className="flex flex-col-reverse lg:flex-row justify-center items-center gap-5">
         <div className="">
@@ -90,7 +90,7 @@ const About = () => {
         <Tabs tabs={tabs} />
       </div>
       {/* Vision  and  Mission */}
-      <div className="flex gap-20">
+      <div className="flex gap-20 flex-col lg:flex-row">
         <div>
           <img
             src={aboutUsVisionMan}

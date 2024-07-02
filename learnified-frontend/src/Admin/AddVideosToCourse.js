@@ -1,118 +1,3 @@
-// import axios from "../apis/admin";
-// import React, { useEffect, useState } from "react";
-// import { useLocation, useNavigate } from "react-router-dom";
-
-// const AddVideosToCourse = () => {
-//   const { state } = useLocation();
-//   const navigate = useNavigate();
-//   const [videos, setVideos] = useState([{}]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState("");
-
-//   const checkState = () => {
-//     if (!state) {
-//       navigate(-1);
-//     }
-//   };
-
-//   const addVideosToCourse = async (e, courseId, videos) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     setLoading(true);
-
-//     const formData = new FormData();
-//     videos.forEach((video, index) => {
-//       formData.append(`videos[${index}][title]`, video.title);
-//       formData.append(`videos[${index}][videoFile]`, video.videoFile);
-//       formData.append(`videos[${index}][thumbnailFile]`, video.thumbnailFile);
-//     });
-
-//     try {
-//       const res = await axios.post(`/course/${courseId}/videos-v2`, formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//         },
-//       });
-//       if (res.data.success) {
-//         console.log("Videos added to course successfully");
-//         // navigate("/courses");
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       setError(error.response.data.message);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     checkState();
-//   }, []);
-
-//   return (
-//     <section className="p-5">
-//       {error && (
-//         <div className="bg-red-500 w-max text-white p-2 rounded-md flex justify-center items-center gap-x-10">
-//           {error}
-//           <p
-//             className="p-3 cursor-pointer bg-blue-700"
-//             onClick={() => setError(null)}
-//           >
-//             x
-//           </p>
-//         </div>
-//       )}
-//       <h1>Add Videos To Course</h1>
-//       <form>
-//         {loading && <p>Loading...</p>}
-//         {videos.map((video, index) => (
-//           <div key={index}>
-//             <input
-//               type="text"
-//               placeholder="Video Title"
-//               onChange={(e) => {
-//                 videos[index].title = e.target.value;
-//                 setVideos([...videos]);
-//               }}
-//             />
-//             <input
-//               type="file"
-//               placeholder="Video file"
-//               onChange={(e) => {
-//                 videos[index].videoFile = e.target.files[0];
-//                 setVideos([...videos]);
-//               }}
-//             />
-//             <input
-//               type="file"
-//               placeholder="Thumbnail file"
-//               onChange={(e) => {
-//                 videos[index].thumbnailFile = e.target.files[0];
-//                 setVideos([...videos]);
-//               }}
-//             />
-//           </div>
-//         ))}
-//         <button
-//           onClick={(e) => {
-//             e.preventDefault();
-//             setVideos([...videos, {}]);
-//           }}
-//         >
-//           Add Video
-//         </button>
-//         <div className="my-4">
-//           <button onClick={(e) => addVideosToCourse(e, state.courseId, videos)}>
-//             Submit
-//           </button>
-//         </div>
-//       </form>
-//     </section>
-//   );
-// };
-
-// export default AddVideosToCourse;
-
 import axios from "../apis/admin";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -182,6 +67,7 @@ const AddVideosToCourse = () => {
         {loading && <p className="text-gray-500">Loading...</p>}
         {videos.map((video, index) => (
           <div key={index} className="mb-4">
+            <label>Video {index + 1}</label>
             <input
               type="text"
               placeholder="Video Title"
@@ -192,6 +78,7 @@ const AddVideosToCourse = () => {
               }}
               className="border border-gray-300 rounded-md px-3 py-2 w-full"
             />
+            <label className="mt-2">Video File</label>
             <input
               type="file"
               onChange={(e) => {
@@ -201,6 +88,7 @@ const AddVideosToCourse = () => {
               }}
               className="mt-2"
             />
+            <label className="mt-2">Thumbnail File</label>
             <input
               type="file"
               onChange={(e) => {
@@ -233,124 +121,3 @@ const AddVideosToCourse = () => {
 };
 
 export default AddVideosToCourse;
-
-// Old Code
-// // AddVideosToCourse.js
-// import axios from "../apis/admin";
-// import React, { useEffect, useState } from "react";
-// import { useLocation, useNavigate } from "react-router-dom";
-
-// const AddVideosToCourse = () => {
-//   const { state } = useLocation();
-//   const navigate = useNavigate();
-//   const [videos, setVideos] = useState([{}]);
-//   const [loading, setLoading] = useState(false);
-//   const [progress, setProgress] = useState(0);
-//   const [error, setError] = useState("");
-
-//   const checkState = () => {
-//     if (!state) {
-//       navigate(-1);
-//     }
-//   };
-
-//   const addVideosToCourse = async (e, courseId, videos) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     setLoading(true);
-
-//     const formData = new FormData();
-//     videos.forEach((video, index) => {
-//       formData.append(`videos[${index}][title]`, video.title);
-//       formData.append(`videos[${index}][videoFile]`, video.videoFile);
-//       formData.append(`videos[${index}][thumbnailFile]`, video.thumbnailFile);
-//     });
-
-//     try {
-//       const res = await axios.post(`/course/${courseId}/videos-v2`, formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//         },
-//         onUploadProgress: (progressEvent) => {
-//           const { loaded, total } = progressEvent;
-//           const percentCompleted = Math.round((loaded * 100) / total);
-//           setProgress(percentCompleted);
-//         },
-//       });
-//       if (res.data.success) {
-//         navigate("/courses");
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       setError(error.response.data.message);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     checkState();
-//   }, []);
-
-//   return (
-//     <section>
-//       {error && (
-//         <div className="bg-red-500 w-max text-white p-2 rounded-md flex justify-center items-center gap-x-10">
-//           {error}
-//           <p
-//             className="p-3 cursor-pointer bg-blue-700"
-//             onClick={() => setError(null)}
-//           >
-//             x
-//           </p>
-//         </div>
-//       )}
-//       <h1>Add Videos To Course</h1>
-//       <form>
-//         {loading && <p>Loading...</p>}
-//         {progress > 0 && <p>Upload Progress: {progress}%</p>}
-//         {videos.map((video, index) => (
-//           <div key={index}>
-//             <input
-//               type="text"
-//               placeholder="Video Title"
-//               onChange={(e) => {
-//                 videos[index].title = e.target.value;
-//                 setVideos([...videos]);
-//               }}
-//             />
-//             <input
-//               type="file"
-//               placeholder="Video file"
-//               onChange={(e) => {
-//                 videos[index].videoFile = e.target.files[0];
-//                 setVideos([...videos]);
-//               }}
-//             />
-//             <input
-//               type="file"
-//               placeholder="Thumbnail file"
-//               onChange={(e) => {
-//                 videos[index].thumbnailFile = e.target.files[0];
-//                 setVideos([...videos]);
-//               }}
-//             />
-//           </div>
-//         ))}
-//         <button
-//           onClick={(e) => {
-//             e.preventDefault();
-//             setVideos([...videos, {}]);
-//           }}
-//         >
-//           Add Video
-//         </button>
-//         <button onClick={(e) => addVideosToCourse(e, state.courseId, videos)}>
-//           Add Videos
-//         </button>
-//       </form>
-//     </section>
-//   );
-// };
-
-// export default AddVideosToCourse;

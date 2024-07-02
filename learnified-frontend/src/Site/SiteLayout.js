@@ -5,6 +5,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import useSiteAuth from "../hooks/useSiteAuth";
 import useAuth from "../hooks/useAuth";
 import axios from "../apis/user";
+import Subscribe from "./home_components/Subscribe";
 
 const SiteLayout = () => {
   const { setSiteAuth } = useSiteAuth();
@@ -49,11 +50,16 @@ const SiteLayout = () => {
         </section>
       ) : (
         <>
-          {/* <div className={`pt-10 ${pathname === "/" ? "bgImage1" : ""}`}> */}
-          <Navbar />
-          <Outlet />
-          <Footer />
-          {/* </div> */}
+          <section className={`pt-10 ${pathname === "/" ? "bgImage1" : ""}`}>
+            <Navbar />
+            <section className={`pt-20 `}>
+              <Outlet />
+            </section>
+            <section className="relative">
+              <Subscribe />
+            </section>
+            <Footer />
+          </section>
         </>
       )}
     </main>

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import logo from "../../assets/logos/logo.png";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import useSiteAuth from "../../hooks/useSiteAuth";
 import axios from "../../apis/user";
 import hamburgerIcon from "../../assets/icons/pack/hamBurgerIcon.svg";
+import scrollToTop from "../../utils/scrollToTop";
 
 const Navbar = () => {
   const { siteAuth } = useSiteAuth();
@@ -11,6 +12,7 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const getPackages = async () => {
     try {
@@ -33,16 +35,34 @@ const Navbar = () => {
     getPackages();
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
   return (
-    <nav className="py-4 flex justify-center items-center z-50 relative shadow-2xl ">
+    <nav
+      className={`py-4 flex justify-center items-center z-50 w-full fixed top-0 transition-all duration-300 ${
+        isScrolled ? "bg-white shadow-lg" : "bg-transparent"
+      }`}
+    >
       <div className="flex sm:gap-4 items-center justify-between w-full mx-5 lg:w-min">
         <div className="flex justify-between">
           <div className="w-52">
-            <img src={logo} alt="Logo" className="object-cover" />
+            <Link to="/" onClick={scrollToTop}>
+              <img
+                src={logo}
+                alt="Logo"
+                className="object-cover cursor-pointer"
+              />
+            </Link>
           </div>
         </div>
         <div className="bg-white flex lg:ps-6 lg:pe-1 gap-5 lg:rounded-full items-center lg:h-16 justify-center border border-black">
@@ -58,24 +78,20 @@ const Navbar = () => {
             <NavLink
               to="/"
               className="text-black sm:text-xl lg:text-2xl hover:text-purple-900 whitespace-nowrap py-4"
+              onClick={scrollToTop}
             >
               Home
             </NavLink>
             <NavLink
               to="/about"
               className="text-black sm:text-xl lg:text-2xl hover:text-purple-900 whitespace-nowrap py-3"
+              onClick={scrollToTop}
             >
               About Us
             </NavLink>
-            {/* <NavLink
-              to="/courses"
-              className="text-black sm:text-xl lg:text-2xl hover:text-purple-900 whitespace-nowrap py-3"
-            >
-              Courses
-            </NavLink> */}
             <div className="relative group">
               <NavLink
-                // to="/packages"
+                to={"#"}
                 className="text-black sm:text-xl lg:text-2xl hover:text-purple-900 whitespace-nowrap py-3"
               >
                 Packages <span className="text-purple-700">⮟</span>
@@ -102,21 +118,6 @@ const Navbar = () => {
             </div>
           </div>
           <div className="lg:flex hidden">
-            {/* {siteAuth.user ? (
-              <NavLink
-                to="/dashboard"
-                className="bg-purple-600 text-white sm:text-xl lg:text-2xl py-3 px-4 rounded-full whitespace-nowrap hover:bg-purple-800"
-              >
-                Dashboard
-              </NavLink>
-            ) : (
-              <NavLink
-                to="/log-in"
-                className="bg-purple-600 text-white sm:text-xl lg:text-2xl py-3 px-4 rounded-full whitespace-nowrap hover:bg-purple-800"
-              >
-                Sign Up / Log In
-              </NavLink>
-            )} */}
             <NavLink
               to={siteAuth.user ? "/dashboard" : "/log-in"}
               className="gradPinkBg sm:text-xl lg:text-2xl py-3 px-4 rounded-full whitespace-nowrap hover:bg-purple-800"

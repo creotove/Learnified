@@ -13,6 +13,7 @@
   "author": "Altamas Shaikh",
   "license": "ISC",
   "dependencies": {
+    "@vimeo/vimeo": "^3.0.3",
     "apicache": "^1.6.3",
     "bcrypt": "^5.1.1",
     "bull": "^4.13.0",

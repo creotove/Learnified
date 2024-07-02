@@ -4,14 +4,14 @@ import arrow from "../../assets/images/arrow.png";
 
 const Hero = () => {
   return (
-    <div className="lg:h-screen pt-28 bgImage1">
+    <div className="lg:h-screen ">
       <div className="flex justify-center items-end">
         <div className="">
           <img
             src={students}
             alt="Students"
-            height={700}
-            width={700}
+            height={900}
+            width={900}
             className=""
           />
         </div>

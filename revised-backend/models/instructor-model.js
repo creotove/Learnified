@@ -31,6 +31,10 @@ const instructorSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide an avatar"],
   },
+  title: {
+    type: String,
+    required: [true, "Please provide a title"],
+  },
 });
 
 const InstructorModel = mongoose.model("Instructor", instructorSchema);

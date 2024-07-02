@@ -1,237 +1,132 @@
-// import React from "react";
-// import { NavLink, Outlet } from "react-router-dom";
-
-// const Index = () => {
-//   return (
-//     <>
-//       <nav>
-//         <ul className="flex gap-x-10 whitespace-nowrap">
-//           <li>
-//             <NavLink
-//               end
-//               className={({ isActive, isPending }) =>
-//                 isPending
-//                   ? "pending"
-//                   : isActive
-//                   ? "bg-black text-white p-3"
-//                   : "p-3"
-//               }
-//               to="/admin"
-//             >
-//               Home
-//             </NavLink>
-//           </li>
-//           <li>
-//             <NavLink
-//               className={({ isActive, isPending }) =>
-//                 isPending
-//                   ? "pending"
-//                   : isActive
-//                   ? "bg-black text-white p-3"
-//                   : "p-3"
-//               }
-//               to="/admin/create-courses"
-//             >
-//               Create Courses
-//             </NavLink>
-//           </li>
-//           <li>
-//             <NavLink
-//               className={({ isActive, isPending }) =>
-//                 isPending
-//                   ? "pending"
-//                   : isActive
-//                   ? "bg-black text-white p-3"
-//                   : "p-3"
-//               }
-//               to="/admin/courses"
-//             >
-//               Courses
-//             </NavLink>
-//           </li>
-//           <li>
-//             <NavLink
-//               className={({ isActive, isPending }) =>
-//                 isPending
-//                   ? "pending"
-//                   : isActive
-//                   ? "bg-black text-white p-3"
-//                   : "p-3"
-//               }
-//               to="/admin/packages"
-//             >
-//               Packages
-//             </NavLink>
-//           </li>
-//           <li>
-//             <NavLink
-//               className={({ isActive, isPending }) =>
-//                 isPending
-//                   ? "pending"
-//                   : isActive
-//                   ? "bg-black text-white p-3"
-//                   : "p-3"
-//               }
-//               to="/admin/create-package"
-//             >
-//               Create Packages
-//             </NavLink>
-//           </li>
-//           <li>
-//             <NavLink
-//               className={({ isActive, isPending }) =>
-//                 isPending
-//                   ? "pending"
-//                   : isActive
-//                   ? "bg-black text-white p-3"
-//                   : "p-3"
-//               }
-//               to="/log-out"
-//             >
-//               Logout
-//             </NavLink>
-//           </li>
-//         </ul>
-//       </nav>
-//       <Outlet />
-//     </>
-//   );
-// };
-
-// export default Index;
-
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const Index = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
   return (
-    <>
-      <nav className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <ul className="flex gap-x-6">
-                <li>
-                  <NavLink
-                    end
-                    className={({ isActive, isPending }) =>
-                      isPending
-                        ? "pending"
-                        : isActive
-                        ? "bg-purple-500 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        : "text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                    }
-                    to="/admin"
-                  >
-                    Home
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isPending
-                        ? "pending"
-                        : isActive
-                        ? "bg-purple-500 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        : "text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                    }
-                    to="/admin/create-courses"
-                  >
-                    Create Courses
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isPending
-                        ? "pending"
-                        : isActive
-                        ? "bg-purple-500 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        : "text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                    }
-                    to="/admin/courses"
-                  >
-                    Courses
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isPending
-                        ? "pending"
-                        : isActive
-                        ? "bg-purple-500 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        : "text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                    }
-                    to="/admin/packages"
-                  >
-                    Packages
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isPending
-                        ? "pending"
-                        : isActive
-                        ? "bg-purple-500 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        : "text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                    }
-                    to="/admin/create-package"
-                  >
-                    Create Packages
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isPending
-                        ? "pending"
-                        : isActive
-                        ? "bg-purple-500 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        : "text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                    }
-                    to="/admin/instructor"
-                  >
-                    Instructor
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isPending
-                        ? "pending"
-                        : isActive
-                        ? "bg-purple-500 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        : "text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                    }
-                    to="/admin/add-instructor"
-                  >
-                    Create Instructor
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isPending
-                        ? "pending"
-                        : isActive
-                        ? "bg-purple-500 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        : "text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                    }
-                    to="/log-out"
-                  >
-                    Logout
-                  </NavLink>
-                </li>
-              </ul>
-            </div>
-          </div>
+    <div className="relative min-h-screen">
+      {/* Hamburger menu for mobile */}
+      <button
+        className="lg:hidden fixed top-4 left-4 z-30 p-2 rounded-md bg-gray-200"
+        onClick={toggleSidebar}
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+
+      {/* Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black opacity-50 z-20 lg:hidden"
+          onClick={toggleSidebar}
+        ></div>
+      )}
+
+      {/* Sidebar */}
+      <nav
+        className={`bg-white shadow-md w-64 fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="h-full overflow-y-auto py-6 px-4">
+          {/* Close button for mobile */}
+          <button
+            className="lg:hidden absolute top-4 right-4 p-2 rounded-md bg-gray-200"
+            onClick={toggleSidebar}
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          <ul className="space-y-2 mt-8">
+            <NavItem to="/admin" end onClick={toggleSidebar}>
+              Home
+            </NavItem>
+            <NavItem to="/admin/courses" onClick={toggleSidebar}>
+              Courses
+            </NavItem>
+            <NavItem to="/admin/create-courses" onClick={toggleSidebar}>
+              Add Courses
+            </NavItem>
+            <NavItem to="/admin/packages" onClick={toggleSidebar}>
+              Packages
+            </NavItem>
+            <NavItem to="/admin/create-package" onClick={toggleSidebar}>
+              Add Packages
+            </NavItem>
+            <NavItem to="/admin/instructor" onClick={toggleSidebar}>
+              Instructor
+            </NavItem>
+            <NavItem to="/admin/add-instructor" onClick={toggleSidebar}>
+              Add Instructor
+            </NavItem>
+            <NavItem to="/admin/training-video" onClick={toggleSidebar}>
+              Training Video
+            </NavItem>
+            <NavItem to="/admin/add-training-video" onClick={toggleSidebar}>
+              Add Training Video
+            </NavItem>
+            <NavItem to="/log-out" onClick={toggleSidebar}>
+              Logout
+            </NavItem>
+          </ul>
         </div>
       </nav>
-      <Outlet />
-    </>
+
+      {/* Main content */}
+      <div className="lg:ml-64 p-4">
+        <Outlet />
+      </div>
+    </div>
   );
 };
+
+const NavItem = ({ to, children, end, onClick }) => (
+  <li>
+    <NavLink
+      end={end}
+      className={({ isActive, isPending }) =>
+        `block px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${
+          isPending
+            ? "text-gray-400"
+            : isActive
+            ? "bg-purple-500 text-white"
+            : "text-gray-600 hover:bg-gray-200"
+        }`
+      }
+      to={to}
+      onClick={onClick}
+    >
+      {children}
+    </NavLink>
+  </li>
+);
 
 export default Index;
